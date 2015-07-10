@@ -18,12 +18,20 @@ Easy way to using GamePad API.
 <script>
 GamePads.VERBOSE = true;
 
-var pads = GamePads);
+var players = [{ ... }, { ... }];
+
+var pads = new GamePads();
 
 function gameLoop() {
-    pads.scan();
-    if (pads[0]) {
-        input(pads[0].value, pads[0].edge);
+    if (pads.active) {
+        pads.scan();
+
+        if (pads[0]) {
+            input(pads[0].value, pads[0].edge);
+        }
+        if (pads[1]) {
+            input(pads[1].value, pads[1].edge);
+        }
     }
     update();
     render();
@@ -33,31 +41,20 @@ gameLoop();
 
 
 function input(curt, edge) {
-    // --- B DASH ---
-    var dash  = curt.X || curt.B;
-    var ratio = dash ? 1.5 : 1; // x1.5 move
-
     // --- Jump ---
     if (edge.A) {
         if (curt.A) {  // A BUTTON OFF -> ON
-            startJump();
+            startJump(...);
         } else {       // A BUTTON ON -> OFF
-            endJump();
+            endJump(...);
         }
     }
 
-
     // --- D-PAD ---
     if (curt.L) {
-        player.velocity.x -= 2 * ratio;
-        if (player.velocity.x <= -4 * ratio) {
-            player.velocity.x  = -4 * ratio;
-        }
+        moveLeft(...);
     } else if (curt.R) {
-        player.velocity.x += 2 * ratio;
-        if (player.velocity.x >= 4 * ratio) {
-            player.velocity.x  = 4 * ratio;
-        }
+        moveRight(...);
     }
 }
 
