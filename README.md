@@ -4,8 +4,9 @@
 
 Easy way to using GamePad API.
 
-- GamePad.js made of [WebModule](https://github.com/uupaa/WebModule).
-- [Spec](https://github.com/uupaa/GamePad.js/wiki/GamePad)
+- Please refer to [Spec](https://github.com/uupaa/GamePad.js/wiki/) and [API Spec](https://github.com/uupaa/GamePad.js/wiki/GamePad) links.
+- [MultiGamePad demo](http://uupaa.github.io/Examples/demo/GamePad.js/test/index.html)
+- The GamePad.js is made of [WebModule](https://github.com/uupaa/WebModule).
 
 ## Browser and NW.js(node-webkit)
 
