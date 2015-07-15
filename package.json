@@ -1,6 +1,6 @@
 {
   "name": "uupaa.gamepad.js",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Easy way to using GamePad API",
   "url": "https://github.com/uupaa/GamePad.js",
   "keywords": ["GamePad", "uupaa", "WebModule", "Unstable"],
