@@ -26,17 +26,18 @@
     "patch": "node ../WebModule/run/patch.js",
     "setup": "node ../WebModule/run/setup.js",
     "start": "cd ../; Python -m SimpleHTTPServer 8000 &",
-    "stop": "killall -- Python -m SimpleHTTPServer 8000; exit 0"
+    "stop": "killall -- Python -m SimpleHTTPServer 8000; exit 0",
+    "add-src": "node ../WebModule/run/add-src.js"
   },
   "webmodule": {
     "develop": false,
     "label": ["@dev"],
     "browser": {
-      "source": ["lib/GamePadCatalog.js", "lib/GamePad.js", "lib/GamePadPlayer.js", "lib/GamePads.js"],
+      "source": ["lib/GamePadDevice.js", "lib/GamePad.js", "lib/GamePadPlayer.js"],
       "output": "release/GamePad.b.min.js"
     },
     "nw": {
-      "source": ["lib/GamePadCatalog.js", "lib/GamePad.js", "lib/GamePadPlayer.js", "lib/GamePads.js"],
+      "source": ["lib/GamePadDevice.js", "lib/GamePad.js", "lib/GamePadPlayer.js"],
       "output": "release/GamePad.nw.min.js"
     }
   },
