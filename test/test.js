@@ -1,25 +1,3 @@
-<!DOCTYPE html><html><head><title>GamePad test</title>
-<meta name="viewport" content="width=device-width, user-scalable=no">
-<meta charset="utf-8"></head><body>
-
-<script src="../lib/WebModule.js"></script>
-<script>
-//publish to global. eg: window.WebModule.Class -> window.Class
-WebModule.publish = true;
-</script>
-
-__MODULES__
-__WMTOOLS__
-__SOURCES__
-__OUTPUT__
-__TEST_CASE__
-
-<style>canvas { background: #eeeeee; }</style>
-<p><canvas id="canvas" width="800" height="200"></p>
-<div id="log" style="position:absolute;top:0;left:0;width:300px;height:500px;">
-</div>
-<script>
-
 var ctx = document.getElementById("canvas").getContext("2d");
 
 var players = [{
@@ -64,53 +42,44 @@ var scene = {
     };
 
 
-GamePads.VERBOSE = true;
+//GamePad.VERBOSE = true;
+//GamePadDevice.VERBOSE = true;
 
-var keyBuffer       = new Uint8Array(10 * 60 * 60); // 10min * 60sec * 60frame * 4bytes = 140KB
+var keyBuffer       = new Uint8Array(5 * 10 * 60 * 60); // 5byte * 10min * 60sec * 60frame = 175KB
 var keyBufferCursor = 0;
+var keyBufferBytes  = 5;
 
 function _addKeyBuffer(pad) {
-    keyBuffer[keyBufferCursor++] = pad.value.U32;
+    keyBuffer.set(GamePadDevice.pack(pad.values), keyBufferCursor);
+    keyBufferCursor += keyBufferBytes;
 
     if (keyBufferCursor >= keyBuffer.length) {
         keyBufferCursor = 0;
     }
 }
 
-var pads = new GamePads(function(player) {
-    if (player === 0) {
-        setTimeout(function() {
-            // add Controller I tracer
-            pads[4] = new GamePadPlayer(keyBuffer);
-        }, 3000);
-    }
-}, function(player) {
-    //
-});
+var pad = new GamePad(function connect(player) {
+        if (player === 0) {
+            if (!pad[4]) {
+                setTimeout(function() {
+                    // add Controller I tracer
+                    pad[4] = new GamePadPlayer(keyBuffer, keyBufferBytes);
+                }, 3000);
+            }
+        }
+    }, function disconnect(player) {
+        //
+    });
 
-
-function startJump(player, ratio) {
-    if (player.onGround) {
-        player.onGround = false;
-        player.velocity.y = player.highJump * ratio;
-    }
-}
-
-function endJump(player) {
-    if (player.velocity.y < player.lowJump) { // 押下時間が満たない場合は、小ジャンプに
-        player.velocity.y = player.lowJump;
-    }
-}
-
+gameLoop();
 function gameLoop() {
-    if (pads.active) {
-        pads.scan();
-
-        if (pads[0]) { input(players[0], pads[0]); _addKeyBuffer(pads[0]); }
-        if (pads[1]) { input(players[1], pads[1]); }
-        if (pads[2]) { input(players[2], pads[2]); }
-        if (pads[3]) { input(players[3], pads[3]); }
-        if (pads[4]) { input(players[4], pads[4]); }
+    if (pad.connected) {
+        pad.input();
+        if (pad[0]) { move(players[0], pad[0]); _addKeyBuffer(pad[0]); }
+        if (pad[1]) { move(players[1], pad[1]); }
+        if (pad[2]) { move(players[2], pad[2]); }
+        if (pad[3]) { move(players[3], pad[3]); }
+        if (pad[4]) { move(players[4], pad[4]); }
     }
 
     update(players[0]);
@@ -120,48 +89,49 @@ function gameLoop() {
     update(players[4]);
 
     render();
-
     requestAnimationFrame(gameLoop);
 }
 
-gameLoop();
-
-function input(player, pad) {
-    //gamepad.scan();
-
-    var curt = pad.value; // current value. { U:UINT8, R:UINT8, ... R2:UINT8 }
-    var edge = pad.edge;  // detection of edge. { U:Boolean, R:Boolean, ... R2:Boolean }
-
-    //console.log(JSON.stringify(curt));
+function move(player, pad) {
+    var vals = pad.values; // current value. Uint8Array
+    var diff = pad.diffs;  // diff vales. Uint8Array
 
     // --- B DASH ---
-    var dash  = curt.X || curt.B;
-    var ratio = dash ? 1.5 : 1; // ダッシュ中は普段の1.5倍速で動作可能
+    var dash  = vals[GAMEPAD_KEY_B] || vals[GAMEPAD_KEY_X];
+    var speed = dash ? 1.5 : 1; // ダッシュ中は普段の1.5倍速で動作可能
 
-    // --- Jump ---
-    if (edge.A || edge.Y) {
-        if (curt.A || curt.Y) { // A BUTTON OFF -> ON
-            startJump(player, ratio);
-        } else {                // A BUTTON ON -> OFF
-            endJump(player);
+    // --- A Jump ---
+    if (diff[GAMEPAD_KEY_A] || diff[GAMEPAD_KEY_Y]) { // change jump button state
+        if (vals[GAMEPAD_KEY_A] || vals[GAMEPAD_KEY_Y]) {
+            _startJump(player, speed); // A OFF -> ON
+        } else {
+            _endJump(player);          // A ON -> OFF
+        }
+    }
+    // --- MOVE LEFT OR RIGHT ---
+    if (vals[GAMEPAD_KEY_L]) {
+        player.velocity.x -= 2 * speed;
+        if (player.velocity.x <= -4 * speed) {
+            player.velocity.x  = -4 * speed;
+        }
+    } else if (vals[GAMEPAD_KEY_R]) {
+        player.velocity.x += 2 * speed;
+        if (player.velocity.x >= 4 * speed) {
+            player.velocity.x  = 4 * speed;
         }
     }
 
-
-    // --- D-PAD ---
-    if (curt.L) {
-        player.velocity.x -= 2 * ratio;
-        if (player.velocity.x <= -4 * ratio) {
-            player.velocity.x  = -4 * ratio;
-        }
-    } else if (curt.R) {
-        player.velocity.x += 2 * ratio;
-        if (player.velocity.x >= 4 * ratio) {
-            player.velocity.x  = 4 * ratio;
+    function _startJump(player, speed) {
+        if (player.onGround) {
+            player.onGround = false;
+            player.velocity.y = player.highJump * speed;
         }
     }
-
-    //console.log(JSON.stringify(curt));
+    function _endJump(player) {
+        if (player.velocity.y < player.lowJump) { // 一瞬だけ押された場合は、小ジャンプに
+            player.velocity.y = player.lowJump;
+        }
+    }
 }
 
 function update(player) {
@@ -175,7 +145,6 @@ function update(player) {
         player.velocity.y = 0.0;
         player.onGround = true;
     }
-
     if (player.onGround) { // 地面の摩擦
         if (player.velocity.x >= 0) {
             player.velocity.x >>= 1;
@@ -194,21 +163,24 @@ function render() {
     ctx.strokeStyle = "black";
     ctx.stroke();
 
+    // player 1
     ctx.strokeStyle = "blue";
     ctx.strokeRect(players[0].x - 10, players[0].y - 20, 20, 20);
 
+    // player 2
     ctx.strokeStyle = "red";
     ctx.strokeRect(players[1].x - 10, players[1].y - 20, 20, 20);
 
+    // player 3
     ctx.strokeStyle = "pink";
     ctx.strokeRect(players[2].x - 10, players[2].y - 20, 20, 20);
 
+    // player 4
     ctx.strokeStyle = "yellow";
     ctx.strokeRect(players[3].x - 10, players[3].y - 20, 20, 20);
 
+    // tracer
     ctx.fillStyle = "black";
     ctx.fillRect(players[4].x - 10, players[4].y - 20, 20, 20);
 }
-</script>
-</body></html>
 

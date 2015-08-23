@@ -4,16 +4,18 @@
 
 Easy way to using GamePad API.
 
-- Please refer to [Spec](https://github.com/uupaa/GamePad.js/wiki/) and [API Spec](https://github.com/uupaa/GamePad.js/wiki/GamePad) links.
-- [MultiGamePad demo](http://uupaa.github.io/Examples/demo/GamePad.js/test/index.html)
-- The GamePad.js is made of [WebModule](https://github.com/uupaa/WebModule).
 
-## Browser and NW.js(node-webkit)
+This module made of [WebModule](https://github.com/uupaa/WebModule).
+
+## Documentation
+- [Spec](https://github.com/uupaa/GamePad.js/wiki/)
+- [API Spec](https://github.com/uupaa/GamePad.js/wiki/GamePad)
+
+## Browser, NW.js and Electron
 
 ```js
 <script src="<module-dir>/lib/WebModule.js"></script>
-<script src="<module-dir>/lib/GamePadCatalog.js"></script>
-<script src="<module-dir>/lib/GamePadConnector.js"></script>
+<script src="<module-dir>/lib/GamePadDevice.js"></script>
 <script src="<module-dir>/lib/GamePad.js"></script>
 <script>
 GamePads.VERBOSE = true;
@@ -23,14 +25,14 @@ var players = [{ ... }, { ... }];
 var pads = new GamePads();
 
 function gameLoop() {
-    if (pads.active) {
-        pads.scan();
+    if (pads.connected) {
+        pads.input();
 
         if (pads[0]) {
-            input(pads[0].value, pads[0].edge);
+            input(pads[0].values, pads[0].diffs);
         }
         if (pads[1]) {
-            input(pads[1].value, pads[1].edge);
+            input(pads[1].values, pads[1].diffs);
         }
     }
     update();
@@ -40,10 +42,10 @@ function gameLoop() {
 gameLoop();
 
 
-function input(curt, edge) {
+function input(current, diffs) {
     // --- Jump ---
-    if (edge.A) {
-        if (curt.A) {  // A BUTTON OFF -> ON
+    if (diffs[GAMEPAD_KEY_A]) {
+        if (current[GAMEPAD_KEY_A]) {  // A BUTTON OFF -> ON
             startJump(...);
         } else {       // A BUTTON ON -> OFF
             endJump(...);
@@ -51,9 +53,9 @@ function input(curt, edge) {
     }
 
     // --- D-PAD ---
-    if (curt.L) {
+    if (current[GAMEPAD_KEY_L]) {
         moveLeft(...);
-    } else if (curt.R) {
+    } else if (current[GAMEPAD_KEY_R]) {
         moveRight(...);
     }
 }

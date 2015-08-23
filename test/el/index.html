@@ -1,0 +1,23 @@
+<!DOCTYPE html><html><head><title>GamePad test</title>
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<meta charset="utf-8"></head><body>
+
+<script src="../../lib/WebModule.js"></script>
+<script>
+// publish to global
+WebModule.publish = true;
+</script>
+
+
+<script src="../wmtools.js"></script>
+<script src="../../lib/GamePadDevice.js"></script>
+<script src="../../lib/GamePad.js"></script>
+<script src="../../lib/GamePadPlayer.js"></script>
+
+<style>canvas { background: #eeeeee; }</style>
+<p><canvas id="canvas" width="800" height="200"></p>
+<div id="log" style="position:absolute;top:0;left:0;width:300px;height:500px;">
+</div>
+<script src="../test.js"></script>
+</body></html>
+
