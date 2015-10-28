@@ -1,6 +1,6 @@
 {
   "name": "uupaa.gamepad.js",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Easy way to using GamePad API",
   "url": "https://github.com/uupaa/GamePad.js",
   "keywords": ["GamePad", "uupaa", "WebModule", "Unstable"],
@@ -16,28 +16,36 @@
     "watch": "node ../WebModule/run/watch.js --verbose --run lint",
     "page": "node ../WebModule/run/page.js --verbose",
     "test": "npm run min; npm run node; npm run browser",
-    "node": "NODE_ENV=production NODE_PATH=lib node --harmony test/node.js",
-    "noded": "NODE_ENV=production NODE_PATH=lib node --debug-brk --harmony test/node.js",
-    "browser": "open http://localhost:8000/GamePad.js/test/index.html",
-    "sim": "node ../WebModule/run/sim.js http://localhost:8000/GamePad.js/test/index.html",
+    "node": "NODE_ENV=production NODE_PATH=lib node test/node/index.js",
+    "noded": "NODE_ENV=production NODE_PATH=lib node --debug-brk test/node/index.js",
+    "browser": "open http://localhost:8000/GamePad.js/test/browser/index.html",
+    "el": "electron test/el",
+    "nw": "nw test/nw",
+    "add-src": "node ../WebModule/run/add-src.js",
+    "sim": "node ../WebModule/run/sim.js http://localhost:8000/GamePad.js/test/browser/index.html",
     "simx": "node ../WebModule/run/sim.js stop",
     "lint": "eslint lib/*.js",
     "score": "node ../WebModule/run/score.js; open lint/plato/index.html",
     "patch": "node ../WebModule/run/patch.js",
     "setup": "node ../WebModule/run/setup.js",
     "start": "cd ../; Python -m SimpleHTTPServer 8000 &",
-    "stop": "killall -- Python -m SimpleHTTPServer 8000; exit 0"
+    "stop": "killall -- Python -m SimpleHTTPServer 8000; exit 0",
+    "add-src": "node ../WebModule/run/add-src.js"
   },
   "webmodule": {
     "develop": false,
     "label": ["@dev"],
     "browser": {
-      "source": ["lib/GamePadCatalog.js", "lib/GamePad.js", "lib/GamePadPlayer.js", "lib/GamePads.js"],
+      "source": ["lib/GamePadDevice.js", "lib/GamePad.js", "lib/GamePadPlayer.js"],
       "output": "release/GamePad.b.min.js"
     },
     "nw": {
-      "source": ["lib/GamePadCatalog.js", "lib/GamePad.js", "lib/GamePadPlayer.js", "lib/GamePads.js"],
+      "source": ["lib/GamePadDevice.js", "lib/GamePad.js", "lib/GamePadPlayer.js"],
       "output": "release/GamePad.nw.min.js"
+    },
+    "el": {
+      "source": ["lib/GamePadDevice.js", "lib/GamePad.js", "lib/GamePadPlayer.js"],
+      "output": "release/GamePad.el.min.js"
     }
   },
   "dependencies": {},

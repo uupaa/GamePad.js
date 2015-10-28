@@ -12,10 +12,10 @@ onmessage = function(event) {
         self.console.table = function() {};
     }
 
-    importScripts("../lib/WebModule.js");
+    importScripts("../../lib/WebModule.js");
 
-    //publish to global. eg: window.WebModule.Class -> window.Class
-    //WebModule.publish = true;
+    // publish to global
+    WebModule.publish = true;
 
     __MODULES__
     __WMTOOLS__
