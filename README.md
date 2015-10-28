@@ -22,17 +22,19 @@ GamePads.VERBOSE = true;
 
 var players = [{ ... }, { ... }];
 
-var pads = new GamePads();
+var pad = new GamePad(function(connect(player) {
+    console.log("connected. player: " + player);
+});
 
 function gameLoop() {
-    if (pads.connected) {
-        pads.input();
+    if (pad.connected) {
+        pad.input();
 
-        if (pads[0]) {
-            input(pads[0].values, pads[0].diffs);
+        if (pad[0]) {
+            input(pad[0].values, pad[0].diffs);
         }
-        if (pads[1]) {
-            input(pads[1].values, pads[1].diffs);
+        if (pad[1]) {
+            input(pad[1].values, pad[1].diffs);
         }
     }
     update();
@@ -42,10 +44,11 @@ function gameLoop() {
 gameLoop();
 
 
-function input(current, diffs) {
+function input(values,  // @arg Uint8Array - current values
+               diffs) { // @arg Uint8Array - diff values
     // --- Jump ---
     if (diffs[GAMEPAD_KEY_A]) {
-        if (current[GAMEPAD_KEY_A]) {  // A BUTTON OFF -> ON
+        if (values[GAMEPAD_KEY_A]) {  // A BUTTON OFF -> ON
             startJump(...);
         } else {       // A BUTTON ON -> OFF
             endJump(...);
@@ -53,9 +56,9 @@ function input(current, diffs) {
     }
 
     // --- D-PAD ---
-    if (current[GAMEPAD_KEY_L]) {
+    if (values[GAMEPAD_KEY_L]) {
         moveLeft(...);
-    } else if (current[GAMEPAD_KEY_R]) {
+    } else if (values[GAMEPAD_KEY_R]) {
         moveRight(...);
     }
 }
