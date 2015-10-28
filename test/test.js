@@ -42,8 +42,8 @@ var scene = {
     };
 
 
-//GamePad.VERBOSE = true;
-//GamePadDevice.VERBOSE = true;
+GamePad.VERBOSE = true;
+GamePadDevice.VERBOSE = true;
 
 var keyBuffer       = new Uint8Array(5 * 10 * 60 * 60); // 5byte * 10min * 60sec * 60frame = 175KB
 var keyBufferCursor = 0;
